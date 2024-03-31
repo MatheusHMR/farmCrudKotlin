@@ -9,7 +9,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
 import android.widget.Toast
-import com.example.sqliteprojectforfarms.controller.FarmDAO
+import com.example.sqliteprojectforfarms.farmDAO.FarmDAO
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {

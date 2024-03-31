@@ -1,4 +1,4 @@
-package com.example.sqliteprojectforfarms.controller
+package com.example.sqliteprojectforfarms.farmDAO
 
 import android.content.ContentValues
 import android.content.Context
