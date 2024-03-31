@@ -10,8 +10,11 @@
         android:id="@+id/LV_farms"
         android:layout_width="333dp"
         android:layout_height="257dp"
-        tools:layout_editor_absoluteX="39dp"
-        tools:layout_editor_absoluteY="458dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.966" />
 
     <EditText
         android:id="@+id/ET_farm_name"
@@ -20,37 +23,50 @@
         android:ems="10"
         android:hint="Farm's Name"
         android:inputType="text"
-        tools:layout_editor_absoluteX="84dp"
-        tools:layout_editor_absoluteY="64dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.079" />
 
     <TextView
         android:id="@+id/TV_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Farm's CRUD"
-        tools:layout_editor_absoluteX="165dp"
-        tools:layout_editor_absoluteY="33dp" />
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.022" />
 
     <Button
         android:id="@+id/BT_create"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="36dp"
         android:text="Create"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.6" />
+        app:layout_constraintVertical_bias="0.573" />
 
     <EditText
-        android:id="@+id/ET_farm_register"
+        android:id="@+id/ET_farm_record"
         android:layout_width="242dp"
         android:layout_height="42dp"
         android:ems="10"
-        android:hint="Farm's Register"
+        android:hint="Farm's Record"
         android:inputType="text"
-        tools:layout_editor_absoluteX="84dp"
-        tools:layout_editor_absoluteY="121dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.165" />
 
     <Button
         android:id="@+id/BT_update"
@@ -58,22 +74,23 @@
         android:layout_height="wrap_content"
         android:text="Update"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/BT_delete"
-        app:layout_constraintHorizontal_bias="0.45"
-        app:layout_constraintStart_toEndOf="@+id/BT_create"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.123"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.6" />
+        app:layout_constraintVertical_bias="0.573" />
 
     <Button
         android:id="@+id/BT_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
         android:text="Delete"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.878"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.6" />
+        app:layout_constraintVertical_bias="0.573" />
 
     <EditText
         android:id="@+id/ET_latitude"
@@ -82,8 +99,11 @@
         android:ems="10"
         android:hint="Latitude"
         android:inputType="text"
-        tools:layout_editor_absoluteX="97dp"
-        tools:layout_editor_absoluteY="257dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.359" />
 
     <EditText
         android:id="@+id/ET_longitude"
@@ -91,8 +111,11 @@
         android:layout_height="66dp"
         android:ems="10"
         android:hint="Longitude"
-        tools:layout_editor_absoluteX="97dp"
-        tools:layout_editor_absoluteY="183dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.248" />
 
     <EditText
         android:id="@+id/ET_valor"
@@ -100,7 +123,10 @@
         android:layout_height="66dp"
         android:ems="10"
         android:hint="Valor"
-        tools:layout_editor_absoluteX="97dp"
-        tools:layout_editor_absoluteY="332dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.47" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
