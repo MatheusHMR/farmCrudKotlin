@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var bt_update: Button
     lateinit var bt_delete: Button
     lateinit var lv_farms: ListView
+    val selectedFarmsFromListView = ArrayList<Farm>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -35,29 +36,37 @@ class MainActivity : AppCompatActivity() {
         bt_update = findViewById(R.id.BT_update)
         lv_farms = findViewById(R.id.LV_farms)
 
+        bt_delete.isEnabled = false
+        bt_update.isEnabled = false
+
+
 //        var farmArray = ArrayList<Farm>()
         val farmDAO = FarmDAO(this)
         val farmArray = farmDAO.getAllFarms()
-        val farmAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, farmArray)
+//        val testAdapter = CustomAdapter(this, farmArray, selectedFarmsFromListView)
+        val farmAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_multiple_choice, farmArray)
+        lv_farms.choiceMode = ListView.CHOICE_MODE_MULTIPLE
         lv_farms.adapter = farmAdapter
-
-
 
         lv_farms.setOnItemClickListener { _, _, position, _ ->
 
             //Setting the List View to be able to:
             //Perceive which items were clicked and check them
             //Fill the edit text fields with the information
-
-            lv_farms.setItemChecked(position, true)
-            lv_farms.getChildAt(position).setBackgroundColor(Color.LTGRAY)
-            val selectedFarm = farmAdapter.getItem(position) as Farm
-
-            et_farm_name.setText(selectedFarm.name)
-            et_farm_record.setText(selectedFarm.record)
-            et_price.setText(selectedFarm.price.toString())
-            et_longitude.setText(selectedFarm.longitude.toString())
-            et_latitude.setText(selectedFarm.latitude.toString())
+            val checked = lv_farms.isItemChecked(position)
+            if(checked){
+                selectedFarmsFromListView.add(farmArray[position])
+                lv_farms.getChildAt(position).setBackgroundColor(Color.LTGRAY)
+            } else{
+                selectedFarmsFromListView.remove(farmArray[position])
+                lv_farms.getChildAt(position).setBackgroundColor(Color.TRANSPARENT)
+            }
+            try{
+                displayFarmOnTextFields(selectedFarmsFromListView.last())
+            } catch (e: NoSuchElementException){
+                clearEditTextFields()
+            }
+            bt_delete.isEnabled = selectedFarmsFromListView.size >= 1 //If equal or greater than one, you can delete the element
         }
 
         bt_create.setOnClickListener {
@@ -73,7 +82,6 @@ class MainActivity : AppCompatActivity() {
                     et_price.text.toString().toFloat(),
                 )
 //                applicationContext
-                var farmDAO : FarmDAO = FarmDAO(this)
                 var creationResult : Boolean = false
 
                 try {
@@ -95,22 +103,21 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
-
         bt_delete.setOnClickListener {
-            if(lv_farms.checkedItemPosition == -1) {
-                Toast.makeText(this, "Please select a Farm from the list!", Toast.LENGTH_LONG)
-                    .show()
-            } else {
-                val clickedFarm = farmAdapter.getItem(lv_farms.checkedItemPosition)
-                if (clickedFarm != null) {
-                    Toast.makeText(this, "Farm Selected: "+clickedFarm.name, Toast.LENGTH_LONG).show()
-                    farmDAO.deleteFarm(clickedFarm)
-                } else {
-                    Toast.makeText(this, "Farm not encountered", Toast.LENGTH_LONG).show()
-                }
-            }
-            unMarksContent(lv_farms.checkedItemPosition)
+
+                farmDAO.deleteFarms(selectedFarmsFromListView)
+                selectedFarmsFromListView.clear()
+                lv_farms.clearChoices()
+                farmAdapter.notifyDataSetChanged()
+                bt_delete.isEnabled = false
+
+//                val clickedFarm = farmAdapter.getItem(lv_farms.checkedItemPosition)
+//                if (clickedFarm != null) {
+//                    Toast.makeText(this, "Farm Selected: "+clickedFarm.name, Toast.LENGTH_LONG).show()
+//                    farmDAO.deleteFarm(clickedFarm)
+//                } else {
+//                    Toast.makeText(this, "Farm not encountered", Toast.LENGTH_LONG).show()
+//                }
         }
     }
     fun validateInputs(): Boolean {
@@ -124,9 +131,17 @@ class MainActivity : AppCompatActivity() {
         et_latitude.text.clear()
         et_price.text.clear()
     }
-    fun unMarksContent(position : Int){
-        //Unmark the selected item
-        lv_farms.setItemChecked(position, false)
-        lv_farms.getChildAt(position).setBackgroundColor(Color.TRANSPARENT) //Makes the color transparent again
+//    fun unMarksContent(position : Int){
+//        //Uncheck the selected item
+//        lv_farms.setItemChecked(position, false)
+//        lv_farms.getChildAt(position).setBackgroundColor(Color.TRANSPARENT) //Makes the color transparent again
+//    }
+
+    fun displayFarmOnTextFields(selectedFarm : Farm){
+        et_farm_name.setText(selectedFarm.name)
+        et_farm_record.setText(selectedFarm.record)
+        et_price.setText(selectedFarm.price.toString())
+        et_longitude.setText(selectedFarm.longitude.toString())
+        et_latitude.setText(selectedFarm.latitude.toString())
     }
 }

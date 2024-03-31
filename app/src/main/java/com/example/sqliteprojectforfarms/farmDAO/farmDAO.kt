@@ -5,6 +5,8 @@ import android.content.Context
 import android.util.Log
 import com.example.sqliteprojectforfarms.Farm
 import com.example.sqliteprojectforfarms.databaseSQLite
+import java.io.IOException
+import java.sql.SQLException
 
 class FarmDAO(context: Context) {
 
@@ -22,8 +24,14 @@ class FarmDAO(context: Context) {
             put("latitude", farm.latitude.toString())
             put("longitude", farm.longitude.toString())
         }
-        val insertionResult = insertionTransaction?.insert("farm", null, farmContent)
-        Log.i("databaseResponses", "Insertion: "+insertionResult)
+        try{
+            val insertionResult = insertionTransaction?.insert("farm", null, farmContent)
+            Log.i("databaseResponses", "Insertion: "+insertionResult)
+        } catch(e: SQLException){
+            Log.i("databaseResponses", "SQL Error .-.")
+        } catch (e: IOException){
+            Log.i("databaseResponses", "Everything went wrong :(")
+        }
     }
 
     fun getAllFarms() : ArrayList<Farm>{
@@ -53,9 +61,11 @@ class FarmDAO(context: Context) {
 
     }
 
-    fun deleteFarm(farm: Farm) {
+    fun deleteFarms(arrayFarm : ArrayList<Farm>) {
 //        Toast.makeText(context, "Farm that is going to be deleted: "+farm.name, Toast.LENGTH_LONG).show()
-        Log.i("databaseResponse", "Farm that is going to be deleted: "+farm.name)
+        for (i in 0 until arrayFarm.size){
+            Log.i("databaseResponse", "Farm that is going to be deleted: "+arrayFarm[0].name)
+        }
     }
 
 

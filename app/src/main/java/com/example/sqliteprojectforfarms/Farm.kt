@@ -16,7 +16,7 @@ class Farm(record: String, name: String, price: Float, latitude: Float, longitud
 
 //    Visual implementation for listView
     override fun toString(): String {
-        return "Register: $record | Name: $name"
+        return "Record: $record | Name: $name"
     }
 
     fun toString2(): String {

@@ -4,7 +4,8 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-class databaseSQLite(context: Context): SQLiteOpenHelper(context, "myIFTMDatabase", null, 1) {
+class databaseSQLite(context: Context): SQLiteOpenHelper(context, "myFarmDatabase", null, 1) {
+
 
     override fun onCreate(db: SQLiteDatabase) {
         val tableName = "Farm"
