@@ -10,13 +10,21 @@ import java.sql.SQLException
 
 class FarmDAO(context: Context) {
 
-    var db : databaseSQLite
+    var db: databaseSQLite
 
     init {
         this.db = databaseSQLite(context)
     }
-    fun createFarm(farm: Farm){
+
+    companion object {
+        fun getInstance(context: Context): FarmDAO {
+            return FarmDAO(context)
+        }
+    }
+
+    fun createFarm(farm: Farm) {
         val insertionTransaction = db.writableDatabase
+        insertionTransaction.beginTransaction()
         var farmContent = ContentValues().apply {
             put("name", farm.name)
             put("record", farm.record)
@@ -24,23 +32,50 @@ class FarmDAO(context: Context) {
             put("latitude", farm.latitude.toString())
             put("longitude", farm.longitude.toString())
         }
-        try{
+        try {
             val insertionResult = insertionTransaction?.insert("farm", null, farmContent)
-            Log.i("databaseResponses", "Insertion: "+insertionResult)
-        } catch(e: SQLException){
+            insertionTransaction.setTransactionSuccessful()
+            Log.i("databaseResponses", "Insertion: $insertionResult")
+        } catch (e: SQLException) {
             Log.i("databaseResponses", "SQL Error .-.")
-        } catch (e: IOException){
+        } catch (e: IOException) {
             Log.i("databaseResponses", "Everything went wrong :(")
+        } finally {
+            insertionTransaction.endTransaction()
         }
     }
 
-    fun getAllFarms() : ArrayList<Farm>{
+    fun createFarms(farms: ArrayList<Farm>) {
+        val insertionTransaction = db.writableDatabase
+        insertionTransaction.beginTransaction()
+        try {
+            for (farm in farms) {
+                var farmContent = ContentValues().apply {
+                    put("name", farm.name)
+                    put("record", farm.record)
+                    put("price", farm.price.toString())
+                    put("latitude", farm.latitude.toString())
+                    put("longitude", farm.longitude.toString())
+                }
+                insertionTransaction.insert("farm", null, farmContent)
+            }
+            insertionTransaction.setTransactionSuccessful()
+        } catch (e: SQLException) {
+            Log.i("databaseResponses", "SQL Error .-.")
+        } catch (e: IOException) {
+            Log.i("databaseResponses", "Everything went wrong :(")
+        } finally {
+            insertionTransaction.endTransaction()
+        }
+    }
+
+    fun getAllFarms(): ArrayList<Farm> {
         val readTransaction = db.readableDatabase
         val cursor = readTransaction.rawQuery("select * from Farm", null)
         val getFarmsArray = ArrayList<Farm>()
 
-        with(cursor){
-            while(moveToNext()){
+        with(cursor) {
+            while (moveToNext()) {
                 val name = getString(getColumnIndexOrThrow("name"))
                 val record = getString(getColumnIndexOrThrow("record"))
                 val price = getFloat(getColumnIndexOrThrow("price"))
@@ -49,7 +84,10 @@ class FarmDAO(context: Context) {
 
                 val farm = Farm(name, record, price, longitude, latitude)
                 getFarmsArray.add(farm)
-                Log.i("Test", "Name: "+name+ " - Record: "+record+ " - Price: "+price+ " - Longitude: " +longitude+ " - Latitude: " +latitude)
+                Log.i(
+                    "Test",
+                    "Name: " + name + " - Record: " + record + " - Price: " + price + " - Longitude: " + longitude + " - Latitude: " + latitude
+                )
             }
         }
         cursor.close()
@@ -57,14 +95,48 @@ class FarmDAO(context: Context) {
         return getFarmsArray
     }
 
-    fun updateFarm(farm: Farm){
-
+    fun updateFarmUsingFarm(oldFarm: Farm, newFarm: Farm) {
+        val updateTransaction = db.writableDatabase
+        updateTransaction.beginTransaction()
+        val farmContent = ContentValues().apply {
+            put("name", newFarm.name)
+            put("record", newFarm.record)
+            put("price", newFarm.price.toString())
+            put("latitude", newFarm.latitude.toString())
+            put("longitude", newFarm.longitude.toString())
+        }
+        try {
+            val condition = "record LIKE '%${oldFarm.record}%'"
+            val updateResult = updateTransaction.update("farm", farmContent, condition, null)
+            updateTransaction.setTransactionSuccessful()
+            Log.i("databaseResponses", "Update: $updateResult")
+        } catch (e: SQLException) {
+            Log.i("databaseResponses", "SQL Error .-.")
+        } catch (e: IOException) {
+            Log.i("databaseResponses", "Everything went wrong :(")
+        } finally {
+            updateTransaction.endTransaction()
+        }
     }
 
-    fun deleteFarms(arrayFarm : ArrayList<Farm>) {
+    fun deleteFarms(farms: ArrayList<Farm>) {
 //        Toast.makeText(context, "Farm that is going to be deleted: "+farm.name, Toast.LENGTH_LONG).show()
-        for (i in 0 until arrayFarm.size){
-            Log.i("databaseResponse", "Farm that is going to be deleted: "+arrayFarm[0].name)
+        val deleteTransaction = db.readableDatabase
+
+        for (farm in farms) {
+            deleteTransaction.beginTransaction()
+            Log.i("databaseResponse", "Farm that is going to be deleted: " + farm.name)
+            try {
+                val condition = "record LIKE '%${farm.record}%'"
+                deleteTransaction.delete("farm", condition, null)
+                deleteTransaction.setTransactionSuccessful()
+                Log.i("databaseResponse", "Farm deleted successfully!")
+            }
+            catch (e: SQLException) {
+                Log.i("databaseResponse", "Couldn't delete the refered farm in the database!")
+            } finally {
+                deleteTransaction.endTransaction()
+            }
         }
     }
 

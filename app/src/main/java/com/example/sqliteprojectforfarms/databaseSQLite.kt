@@ -6,7 +6,9 @@ import android.database.sqlite.SQLiteOpenHelper
 
 class databaseSQLite(context: Context): SQLiteOpenHelper(context, "myFarmDatabase", null, 1) {
 
-
+//    init{
+//        context.deleteDatabase("myFarmDatabase")
+//    }
     override fun onCreate(db: SQLiteDatabase) {
         val tableName = "Farm"
         val farmName = "name"
@@ -29,6 +31,10 @@ class databaseSQLite(context: Context): SQLiteOpenHelper(context, "myFarmDatabas
         val SQL_exclusao = "DROP TABLE IF EXISTS Farm"
         db.execSQL(SQL_exclusao)
         onCreate(db)
+    }
+
+    fun delete(context: Context){
+        context.deleteDatabase("myFarmDatabase")
     }
 
 }

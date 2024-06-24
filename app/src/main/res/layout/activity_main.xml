@@ -35,12 +35,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Farm's CRUD"
-        android:textSize="20sp"
+        android:textColor="#673AB7"
+        android:textSize="28sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.022" />
+        app:layout_constraintVertical_bias="0.008" />
 
     <Button
         android:id="@+id/BT_create"
@@ -84,6 +87,7 @@
         android:id="@+id/BT_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="buttonCreate"
         android:text="Delete"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -128,5 +132,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.47" />
+
+    <Button
+        android:id="@+id/BT_backup_view"
+        android:layout_width="75dp"
+        android:layout_height="41dp"
+        app:icon="@drawable/cloud_circle"
+        app:iconSize="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.97"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.008" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

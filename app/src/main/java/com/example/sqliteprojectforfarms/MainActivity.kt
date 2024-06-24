@@ -1,16 +1,20 @@
 package com.example.sqliteprojectforfarms
 
+import android.app.AlertDialog
+import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
 import android.widget.Toast
+import androidx.core.view.children
+import backupView.backupView
 import com.example.sqliteprojectforfarms.farmDAO.FarmDAO
-import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
     lateinit var et_farm_name: EditText
@@ -21,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var bt_create: Button
     lateinit var bt_update: Button
     lateinit var bt_delete: Button
+    lateinit var bt_backup: Button
     lateinit var lv_farms: ListView
     val selectedFarmsFromListView = ArrayList<Farm>()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,16 +39,17 @@ class MainActivity : AppCompatActivity() {
         bt_create = findViewById(R.id.BT_create)
         bt_delete = findViewById(R.id.BT_delete)
         bt_update = findViewById(R.id.BT_update)
+        bt_backup = findViewById(R.id.BT_backup_view)
         lv_farms = findViewById(R.id.LV_farms)
+        val intent_backup = Intent(this, backupView::class.java)
 
         bt_delete.isEnabled = false
         bt_update.isEnabled = false
 
 
-//        var farmArray = ArrayList<Farm>()
         val farmDAO = FarmDAO(this)
         val farmArray = farmDAO.getAllFarms()
-//        val testAdapter = CustomAdapter(this, farmArray, selectedFarmsFromListView)
+
         val farmAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_multiple_choice, farmArray)
         lv_farms.choiceMode = ListView.CHOICE_MODE_MULTIPLE
         lv_farms.adapter = farmAdapter
@@ -67,6 +73,7 @@ class MainActivity : AppCompatActivity() {
                 clearEditTextFields()
             }
             bt_delete.isEnabled = selectedFarmsFromListView.size >= 1 //If equal or greater than one, you can delete the element
+            bt_update.isEnabled = selectedFarmsFromListView.size == 1
         }
 
         bt_create.setOnClickListener {
@@ -81,48 +88,91 @@ class MainActivity : AppCompatActivity() {
                     et_latitude.text.toString().toFloat(),
                     et_price.text.toString().toFloat(),
                 )
-//                applicationContext
-                var creationResult : Boolean = false
+                farmDAO.createFarm(farm)
+                farmArray.add(farm)
+                clearEditTextFields()
+                lv_farms.adapter = farmAdapter
+            }
+        }
 
-                try {
-                    farmDAO.createFarm(farm)
-                    creationResult = true
-                } catch(error : IOException) {
-                    Toast.makeText(this, "Error while inserting into the database!", Toast.LENGTH_LONG).show()
-                    Log.i("Error", "Error while inserting into the database!")
+        bt_update.setOnClickListener{
+            val farmDataToUpdate = Farm(
+                et_farm_name.text.toString(),
+                et_farm_record.text.toString(),
+                et_price.text.toString().toFloat(),
+                et_longitude.text.toString().toFloat(),
+                et_latitude.text.toString().toFloat()
+            )
+            var oldFarm = selectedFarmsFromListView.last()
+            Log.i("Test", "Received old farm: ${oldFarm.toString2()}")
+            val response = validateUpdate(oldFarm,farmDataToUpdate)
+            Log.i("Test", "Response: $response")
+            if(response == ""){
+                farmDAO.updateFarmUsingFarm(selectedFarmsFromListView[0], farmDataToUpdate)
+                validateUpdate(oldFarm, farmDataToUpdate)
+//                oldFarm = farmDataToUpdate
+                oldFarm.name = farmDataToUpdate.name
+                oldFarm.record = farmDataToUpdate.record
+                oldFarm.price = farmDataToUpdate.price
+                oldFarm.longitude = farmDataToUpdate.longitude
+                oldFarm.latitude = farmDataToUpdate.latitude
+                lv_farms.clearChoices()
+                selectedFarmsFromListView.clear()
+                farmAdapter.notifyDataSetChanged()
+                bt_update.isEnabled = false
+                bt_delete.isEnabled = false
+                clearEditTextFields()
+                lv_farms.getChildAt(farmAdapter.getPosition(oldFarm)).setBackgroundColor(Color.TRANSPARENT)
+            } else {
+                val builder = AlertDialog.Builder(this)
+                builder.setTitle("ATTENTION!!")
+                builder.setMessage(response)
+                builder.setPositiveButton("OK") { dialog, _ ->
+                    dialog.dismiss()
                 }
-
-                if(!creationResult){
-                    Log.i("Error", "Couldn't insert the solicited farm into the database!")
-                } else {
-                    Toast.makeText(this, "Farm added to the database successfully! :)", Toast.LENGTH_LONG).show()
-                    farmArray.add(farm)
-                    clearEditTextFields()
-                    lv_farms.adapter = farmAdapter
-                }
+                val dialog = builder.create()
+                dialog.show()
             }
         }
 
         bt_delete.setOnClickListener {
+            lv_farms.clearChoices()
+            lv_farms.children.forEach{ farm ->
+                farm.setBackgroundColor(Color.TRANSPARENT)
+            }
+            farmDAO.deleteFarms(selectedFarmsFromListView)
+            farmArray.removeAll(selectedFarmsFromListView.toSet())
+            selectedFarmsFromListView.clear()
+            farmAdapter.notifyDataSetChanged()
+            bt_delete.isEnabled = false
+            bt_update.isEnabled = false
+            clearEditTextFields()
+        }
 
-                farmDAO.deleteFarms(selectedFarmsFromListView)
-                selectedFarmsFromListView.clear()
-                lv_farms.clearChoices()
-                farmAdapter.notifyDataSetChanged()
-                bt_delete.isEnabled = false
-
-//                val clickedFarm = farmAdapter.getItem(lv_farms.checkedItemPosition)
-//                if (clickedFarm != null) {
-//                    Toast.makeText(this, "Farm Selected: "+clickedFarm.name, Toast.LENGTH_LONG).show()
-//                    farmDAO.deleteFarm(clickedFarm)
-//                } else {
-//                    Toast.makeText(this, "Farm not encountered", Toast.LENGTH_LONG).show()
-//                }
+        bt_backup.setOnClickListener {
+            startActivity(intent_backup)
         }
     }
     fun validateInputs(): Boolean {
         return (et_farm_name.text.isNotBlank() && et_farm_record.text.isNotBlank() &&
                 et_longitude.text.isNotBlank() && et_latitude.text.isNotBlank() && et_price.text.isNotBlank())
+    }
+
+    fun validateUpdate(oldFarm : Farm, newFarm : Farm) : String {
+        var response = ""
+        if(oldFarm.name == newFarm.name && oldFarm.record == newFarm.record &&
+            oldFarm.latitude == newFarm.latitude && oldFarm.longitude == newFarm.longitude &&
+            oldFarm.price == newFarm.price){
+
+            response = "You are updating with the same data that already exists!" +
+                    " Are you sure you want to do that?"
+            Log.i("Test", "All data is cloned")
+        } else {
+            Log.i("Test", "Passed the validation")
+        }
+        Log.i("Test", "Entered Validation, ${oldFarm.toString2()}")
+        Log.i("Test", newFarm.toString2())
+        return response
     }
     fun clearEditTextFields(){
         et_farm_name.text.clear()
@@ -131,12 +181,6 @@ class MainActivity : AppCompatActivity() {
         et_latitude.text.clear()
         et_price.text.clear()
     }
-//    fun unMarksContent(position : Int){
-//        //Uncheck the selected item
-//        lv_farms.setItemChecked(position, false)
-//        lv_farms.getChildAt(position).setBackgroundColor(Color.TRANSPARENT) //Makes the color transparent again
-//    }
-
     fun displayFarmOnTextFields(selectedFarm : Farm){
         et_farm_name.setText(selectedFarm.name)
         et_farm_record.setText(selectedFarm.record)
@@ -144,4 +188,24 @@ class MainActivity : AppCompatActivity() {
         et_longitude.setText(selectedFarm.longitude.toString())
         et_latitude.setText(selectedFarm.latitude.toString())
     }
+    fun insertingExamples(sampleSize : Int, startingPoint: Int) : ArrayList<Farm>{
+        val examplesArray = ArrayList<Farm>()
+        for(i in startingPoint until sampleSize + 1){
+            val farmIterator = Farm(
+                "farm${i}",
+                "name${i}",
+                i.toFloat()*(i.toFloat() - 1),
+                i.toFloat()*(i.toFloat() - 2),
+                i.toFloat()*(i.toFloat() + 3)
+            )
+            examplesArray.add(farmIterator)
+        }
+        return examplesArray
+    }
+    //This method belongs to this view
+    fun buttonBackup(view : View){
+//        startActivity(intent(this, BackupView::class.java))
+    }
+
+//            GenyMotion
 }
